@@ -5,10 +5,9 @@ namespace NumbersGame
 {
     class Program
     {
+        static Random numberGenerator = new Random();
         static void Main(string[] args)
         {
-            Random numberGenerator = new Random();
-
             bool continuePlaying = true;
 
             while (continuePlaying)
@@ -22,8 +21,10 @@ namespace NumbersGame
                 bool choosenHelp = false;
 
                 Console.WriteLine("Välkommen! Jag kommer tänka på ett nummer. Du ska gissa vilket. Vilken svårighet vill du ha? \"Lätt\", \"medel\" eller \"svårt\"?");
+                
+                //Checks for which difficulty the user chooses. Sets the settings accordingly.  
                 while (!choosenDifficulty)
-                {                
+                {       
                     string difficulty = Console.ReadLine().ToUpper();
                     switch (difficulty)
                     {
@@ -57,7 +58,9 @@ namespace NumbersGame
                     }
                 }
 
-                Console.WriteLine("Vill du få tips på när du är nära numret? Svara \"Ja\" eller \"Nej\"");
+                Console.WriteLine("\nVill du få tips på när du är nära numret? Svara \"Ja\" eller \"Nej\"");
+
+                //Checks if the user wants to know if his guess is close. 
                 while (!choosenHelp)
                 {
                     string answer = Console.ReadLine().ToUpper();
@@ -66,11 +69,11 @@ namespace NumbersGame
                         case "JA":
                             choosenHelp = true;
                             helpOn = true;
-                            Console.WriteLine("Du valde att få tips när du är nära numret. Börja med att gissa ett nummer. Lycka till!");
+                            Console.WriteLine("Du valde att få tips när du är nära numret. Börja med att gissa ett nummer. Lycka till!\n");
                             break;
                         case "NEJ":
                             choosenHelp = true;
-                            Console.WriteLine("Du valde att inte få tips när du är nära numret. Börja med att gissa ett nummer. Lycka till!");
+                            Console.WriteLine("Du valde att inte få tips när du är nära numret. Börja med att gissa ett nummer. Lycka till!\n");
                             break;
                         default:
                             Console.WriteLine("Jag förstod inte. Vänligen svara \"Ja\" eller \"Nej\"");
@@ -79,6 +82,8 @@ namespace NumbersGame
                 }
 
                 int guessesLeft = nrOfGuesses;
+
+                //Loops through the guesses and checks if the user got it right, is close, have guesses left etc
                 while (guessesLeft > 0)
                 {
 
@@ -92,12 +97,12 @@ namespace NumbersGame
                     }
                     else if (guessedNumber > generatedNumber & guessesLeft !=0)
                     {
-                        Console.WriteLine("Tyvärr du gissade för högt."+ writeIfCloseAndHelpOn(guessedNumber));
+                        Console.WriteLine("Tyvärr du gissade för högt."+ writeIfCloseAndHelpOn(guessedNumber, generatedNumber, closeHelpNr, helpOn));
                         Console.WriteLine(getGuessAgainComment());
                     }
                     else if (guessedNumber < generatedNumber & guessesLeft != 0)
                     {
-                        Console.WriteLine("Tyvärr du gissade för lågt." + writeIfCloseAndHelpOn(guessedNumber));
+                        Console.WriteLine("Tyvärr du gissade för lågt." + writeIfCloseAndHelpOn(guessedNumber, generatedNumber, closeHelpNr, helpOn));
                         Console.WriteLine(getGuessAgainComment());
                     }
                     else if (guessesLeft == 0)
@@ -107,34 +112,35 @@ namespace NumbersGame
                     }
                 }
 
-                Console.WriteLine("\nVill du starta om spelet? Skriv \"Ja\" isåfall, annars klicka bara enter.");
+                //Checks if the user wants to play again
+                Console.WriteLine("\n\nVill du starta om spelet? Skriv \"Ja\" isåfall, annars klicka bara enter.");
                 if (!(Console.ReadLine().ToUpper()=="JA"))
                 {
                     continuePlaying = false;
                 }
                 else
                 {
-                    Console.WriteLine("\n\n");
+                    Console.WriteLine("\n\n----------------------------------------------------------------------------------\n\n");
                 }
 
+            //Returns a random "guess again" message
+            static string getGuessAgainComment()
+            {
+                string[] comments = new string[] { "Gissa igen!", "Gissa en gång till!", "Gissa ännu en gång!", "Försök med en till gissning!" };
+                return comments[numberGenerator.Next(0, comments.Length)];
+            }
 
-
-
-                string getGuessAgainComment()
+            //Returns a random congrats message
+            static string getCongratsMessage()
+            {
+                string[] comments = new string[] { "Woho! Du gjorde det!", "Grattis du gissade rätt!", "Du klarade det!", "Såja! Du gissade rätt nummer!" };
+                return comments[numberGenerator.Next(0, comments.Length)];
+            }
+            
+            //Returns "Det bränns" if the guessed nr is close to the generated number and if the user has extra help on. 
+            static string writeIfCloseAndHelpOn(int guessedNr, int generatedNr, int closeHelpNr, bool helpOn)
                 {
-                    string[] comments = new string[] { "Gissa igen!", "Gissa en gång till!", "Gissa ännu en gång!", "Försök med en till gissning!" };
-                    return comments[numberGenerator.Next(0, comments.Length)];
-                }
-
-                string getCongratsMessage()
-                {
-                    string[] comments = new string[] { "Woho! Du gjorde det!", "Grattis du gissade rätt!", "Du klarade det!", "Såja! Du gissade rätt nummer!" };
-                    return comments[numberGenerator.Next(0, comments.Length)];
-                }
-
-                string writeIfCloseAndHelpOn(int guessedNr)
-                {
-                    if (Math.Abs(guessedNr-generatedNumber) <=closeHelpNr & helpOn)
+                    if (Math.Abs(guessedNr - generatedNr) <= closeHelpNr & helpOn)
                     {
                         return " Men det bränns.";
                     }
